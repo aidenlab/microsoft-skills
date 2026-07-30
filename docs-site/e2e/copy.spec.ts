@@ -41,6 +41,6 @@ test.describe('Copy to Clipboard', () => {
 
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
     
-    expect(clipboardText).toMatch(/npx skills add microsoft\/skills --skill/);
+    expect(clipboardText).toMatch(/^npx skills add (microsoft\/(azure-)?skills --skill |https:\/\/github\.com\/microsoft\/skills\/tree\/main\/)/);
   });
 });
