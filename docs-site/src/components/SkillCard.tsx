@@ -56,13 +56,24 @@ export const LANG_LABELS: Record<string, string> = {
   core: 'Core',
 };
 
+// Skills come from different sources/plugins.
+// First matching prefix wins, and default to this repo's root.
+export function getInstallCommand(skill: Pick<Skill, 'name' | 'path'>): string {
+  const sources: [prefix: string, command: () => string][] = [
+    ['.github/plugins/azure-skills/', () => `npx skills add microsoft/azure-skills --skill ${skill.name}`],
+    ['.github/plugins/', () => `npx skills add https://github.com/microsoft/skills/tree/main/${skill.path}`],
+  ];
+  const match = sources.find(([prefix]) => skill.path.startsWith(prefix));
+  return match ? match[1]() : `npx skills add microsoft/skills --skill ${skill.name}`;
+}
+
 export function SkillCard({ skill, onClick }: SkillCardProps) {
   const [copied, setCopied] = useState(false);
   
   const langStyle = LANG_STYLES[skill.language] || LANG_STYLES.core;
   const langLabel = LANG_LABELS[skill.language] || skill.language;
   
-  const installCommand = `npx skills add microsoft/skills --skill ${skill.name}`;
+  const installCommand = getInstallCommand(skill);
   
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();

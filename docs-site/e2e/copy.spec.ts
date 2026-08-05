@@ -8,7 +8,7 @@ test.describe('Copy to Clipboard', () => {
   });
 
   test('copy button is visible on skill cards', async ({ page }) => {
-    const skillCard = page.locator('.skills-grid a').first();
+    const skillCard = page.locator('.skills-grid > div').first();
     await skillCard.waitFor({ state: 'visible', timeout: 10000 });
 
     await skillCard.hover();
@@ -18,7 +18,7 @@ test.describe('Copy to Clipboard', () => {
   });
 
   test('clicking copy button shows success feedback', async ({ page }) => {
-    const skillCard = page.locator('.skills-grid a').first();
+    const skillCard = page.locator('.skills-grid > div').first();
     await skillCard.waitFor({ state: 'visible', timeout: 10000 });
     await skillCard.hover();
 
@@ -30,17 +30,22 @@ test.describe('Copy to Clipboard', () => {
     await expect(copiedButton).toBeVisible({ timeout: 3000 });
   });
 
-  test('copy button copies correct install command', async ({ page }) => {
-    const skillCard = page.locator('.skills-grid a').first();
-    await skillCard.waitFor({ state: 'visible', timeout: 10000 });
-    await skillCard.hover();
+  const commandCases = [
+    { source: 'direct', name: 'mcp-builder', command: 'npx skills add microsoft/skills --skill mcp-builder' },
+    { source: 'azure-skills plugin', name: 'microsoft-foundry', command: 'npx skills add microsoft/azure-skills --skill microsoft-foundry' },
+    { source: 'generic plugin', name: 'azure-ai-projects-py', command: 'npx skills add https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-python/skills/azure-ai-projects-py' },
+  ];
 
-    const copyButton = skillCard.locator('button:has-text("Copy")');
-    await expect(copyButton).toBeVisible();
-    await copyButton.click();
+  for (const { source, name, command } of commandCases) {
+    test(`copy button has exact install command for ${source} skill (${name})`, async ({ page }) => {
+      await page.getByTestId('search-input').fill(name);
+      const skillCard = page.locator('.skills-grid > div').filter({
+        has: page.getByRole('heading', { level: 3, name, exact: true }),
+      });
+      await skillCard.waitFor({ state: 'visible', timeout: 10000 });
 
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    
-    expect(clipboardText).toMatch(/npx skills add microsoft\/skills --skill/);
-  });
+      const copyButton = skillCard.getByRole('button', { name: 'Copy' });
+      await expect(copyButton).toHaveAttribute('title', `Copy: ${command}`);
+    });
+  }
 });

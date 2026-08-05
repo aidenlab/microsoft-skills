@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Skill } from './SkillCard';
-import { LANG_STYLES, LANG_LABELS } from './SkillCard';
+import { LANG_STYLES, LANG_LABELS, getInstallCommand } from './SkillCard';
 
 interface SkillDetailModalProps {
   skill: Skill | null;
@@ -30,7 +30,7 @@ export function SkillDetailModal({ skill, onClose }: SkillDetailModalProps) {
     }
   }, [onClose]);
 
-  const installCommand = skill ? `npx skills add microsoft/skills --skill ${skill.name}` : '';
+  const installCommand = skill ? getInstallCommand(skill) : '';
 
   const handleCopy = useCallback(async () => {
     try {
