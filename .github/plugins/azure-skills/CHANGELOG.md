@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.28
+
+- fix: improve Foundry Copilot app preflight ([#3061](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3061))
+
+## 1.2.27
+
+- refactor: improve azd sample selection guidance and agent creation workflow in foundry skill ([#3056](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3056))
+
 ## 1.2.26
 
 - chore: remove unused py sdk ref and add auth best practices ref in foundry skill's skill.md ([#3041](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3041))
