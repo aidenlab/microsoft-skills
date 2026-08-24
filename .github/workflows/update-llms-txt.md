@@ -54,3 +54,4 @@ This workflow keeps our Foundry documentation index up-to-date by:
 - The scraper respects rate limits when fetching from Microsoft Learn
 - Only creates a PR if there are actual content changes
 - The llms.txt follows the llms.txt specification for LLM-friendly documentation
+- If `COPILOT_GITHUB_TOKEN` is not configured, the agent jobs should be skipped instead of failing the workflow

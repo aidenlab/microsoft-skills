@@ -44,6 +44,7 @@ jobs:
     outputs:
       comment_id: ""
       comment_repo: ""
+      copilot_token_configured: ${{ steps.copilot_token.outputs.configured }}
     steps:
       - name: Setup Scripts
         uses: githubnext/gh-aw/actions/setup@a933c835b5e2d12ae4dead665a0fdba420a2d421 # v0.36.0
@@ -59,9 +60,21 @@ jobs:
             setupGlobals(core, github, context, exec, io);
             const { main } = require('/opt/gh-aw/actions/check_workflow_timestamp_api.cjs');
             await main();
+      - name: Check COPILOT_GITHUB_TOKEN availability
+        id: copilot_token
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          if [ -n "$COPILOT_GITHUB_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ COPILOT_GITHUB_TOKEN is not configured; skipping agent jobs." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   agent:
     needs: activation
+    if: needs.activation.outputs.copilot_token_configured == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1039,5 +1052,4 @@ jobs:
             setupGlobals(core, github, context, exec, io);
             const { main } = require('/opt/gh-aw/actions/safe_output_handler_manager.cjs');
             await main();
-
 
